@@ -1,0 +1,994 @@
+  <!DOCTYPE html>                                                                                                                                                                             
+  <html lang="en">                                                                                                                                                                            
+  <head>                                                                                                                                                                                      
+  <meta charset="UTF-8"/>                                                                                                                                                                     
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>                                                                                                                      
+  <title>TechCollect — Beat the Attorney</title>                                                                                                                                              
+  <style>                                                                                                                                                                                     
+  *{box-sizing:border-box;margin:0;padding:0}                                                                                                                                                 
+  body{background:#080420;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow:hidden;cursor:none}                                                                     
+  canvas{display:block;position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:0}                                                                                    
+  #hud{                                                                                                                                                                                       
+    position:fixed;top:0;left:0;right:0;                                                                                                                                                      
+    display:flex;gap:0;align-items:stretch;z-index:5;                                                                                                                                         
+    background:rgba(8,4,40,.97);border-bottom:1px solid #2a1b8f;pointer-events:none;                                                                                                          
+  }                                                                                                                                                                                           
+  .hi{text-align:center;padding:8px 20px;border-right:1px solid #1e1560}                                                                                                                      
+  .hl{font-size:8px;letter-spacing:2.5px;text-transform:uppercase;color:#4c3bd6;margin-bottom:2px}                                                                                            
+  .hv{font-size:17px;font-weight:900;color:#7a6cff;font-variant-numeric:tabular-nums}                                                                                                         
+  .hv.red{color:#ff4466}.hv.green{color:#00dd88}                                                                                                                                              
+  .hsep{flex:1}                                                                                                                                                                               
+  #muteBtn{                                                                                                                                                                                   
+    position:fixed;top:8px;right:12px;z-index:6;                                                                                                                                              
+    appearance:none;border:1px solid #4c3bd6;border-radius:8px;                                                                                                                               
+    padding:6px 12px;background:rgba(76,59,214,.22);color:#cfc9ff;                                                                                                                            
+    font-size:12px;font-weight:700;cursor:pointer;letter-spacing:1px                                                                                                                          
+  }                                                                                                                                                                                           
+  #muteBtn:hover{background:rgba(76,59,214,.45)}                                                                                                                                              
+  .btn{                                                                                                                                                                                       
+    appearance:none;border:none;border-radius:10px;padding:13px 26px;                                                                                                                       
+    font-weight:900;font-size:14px;letter-spacing:1.5px;text-transform:uppercase;                                                                                                             
+    cursor:pointer;transition:all .15s                                                                                                                                                        
+  }                                                                                                                                                                                           
+  .btn.primary{                                                                                                                                                                               
+    background:linear-gradient(135deg,#4c3bd6,#7a6cff);color:#fff;                                                                                                                            
+    box-shadow:0 0 24px rgba(122,108,255,.55);border:2px solid #9b8fff                                                                                                                        
+  }                                                                                                                                                                                           
+  .btn.primary:hover{filter:brightness(1.12);transform:scale(1.03)}                                                                                                                           
+  .btn.ghost{background:rgba(76,59,214,.15);border:1px solid #4c3bd6;color:#cfc9ff}                                                                                                           
+  .btn.ghost:hover{background:rgba(76,59,214,.3)}                                                                                                                                             
+  .ov{                                                                                                                                                                                        
+    position:fixed;inset:0;display:flex;align-items:center;justify-content:center;                                                                                                            
+    background:rgba(6,3,32,.97);z-index:10;padding:20px;pointer-events:auto;overflow-y:auto                                                                                                   
+  }                                                                                                                                                                                           
+  .panel{                                                                                                                                                                                     
+    background:linear-gradient(145deg,#1a1060,#0d0838);border:2px solid #4c3bd6;                                                                                                              
+    border-radius:18px;padding:28px 30px;width:700px;max-width:96vw;max-height:92vh;overflow-y:auto;                                                                                          
+    box-shadow:0 0 60px rgba(122,108,255,.4);color:#fff                                                                                                                                       
+  }                                                                                                                                                                                           
+  .tc-logo{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:#7a6cff;margin-bottom:6px}                                                                                        
+  .glow{text-shadow:0 0 18px rgba(122,108,255,.7)}                                                                                                                                            
+  h1{font-size:28px;font-weight:900;letter-spacing:1px;line-height:1.1}                                                                                                                       
+  .sub{color:#7a6cff;font-size:11px;letter-spacing:3px;text-transform:uppercase;margin:4px 0 16px}                                                                                            
+  .rules{color:#bdb7ff;line-height:1.6;font-size:14px;margin-bottom:6px}                                                                                                                      
+  .rules p{margin:4px 0}.rules b{color:#fff}                                                                                                                                                  
+  .tag{                                                                                                                                                                                       
+    display:inline-block;background:rgba(76,59,214,.35);border:1px solid #4c3bd6;                                                                                                             
+    border-radius:5px;padding:1px 7px;font-size:12px;font-weight:700;margin:0 2px                                                                                                             
+  }                                                                                                                                                                                           
+  .tag.green{background:rgba(0,180,80,.25);border-color:#00dd88;color:#00dd88}                                                                                                                
+  .tag.red{background:rgba(255,40,80,.2);border-color:#ff4466;color:#ff4466}                                                                                                                  
+  #hsForm{min-height:44px;margin:16px 0 4px}                                                                                                                                                  
+  .warn{font-size:11px;color:#ffda78;margin-top:6px;display:none;                                                                                                                             
+    border:1px solid rgba(255,218,120,.3);border-radius:6px;padding:6px 10px}                                                                                                                 
+  .rp{                                                                                                                                                                                        
+    background:linear-gradient(145deg,#1a1060,#0d0838);border:2px solid #4c3bd6;                                                                                                              
+    border-radius:18px;padding:30px;width:620px;max-width:96vw;                                                                                                                               
+    box-shadow:0 0 60px rgba(122,108,255,.5);text-align:center;color:#fff                                                                                                                     
+  }                                                                                                                                                                                           
+  .rl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#7a6cff;margin-bottom:3px}                                                                                              
+  .bignum{font-size:42px;font-weight:900;color:#7a6cff;margin:4px 0;                                                                                                                          
+    text-shadow:0 0 22px rgba(122,108,255,.6)}                                                                                                                                                
+  .bignum.red{color:#ff4466;text-shadow:0 0 18px rgba(255,68,102,.5)}                                                                                                                         
+  .bignum.green{color:#00dd88;text-shadow:0 0 18px rgba(0,221,136,.5)}                                                                                                                        
+  .score-vs{display:flex;gap:20px;justify-content:center;align-items:center;margin:14px 0}                                                                                                    
+  .score-side{flex:1;padding:14px;border-radius:10px}                                                                                                                                         
+  .score-side.player{background:rgba(0,180,80,.12);border:1px solid rgba(0,221,136,.3)}                                                                                                       
+  .score-side.atty{background:rgba(255,40,80,.1);border:1px solid rgba(255,68,102,.3)}                                                                                                        
+  .score-side .lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}                                                                                               
+  .score-side.player .lbl{color:#00dd88}                                                                                                                                                      
+  .score-side.atty .lbl{color:#ff4466}                                                                                                                                                        
+  .score-side .num{font-size:52px;font-weight:900;line-height:1}                                                                                                                              
+  .score-side.player .num{color:#00dd88;text-shadow:0 0 16px rgba(0,221,136,.5)}                                                                                                              
+  .score-side.atty .num{color:#ff4466;text-shadow:0 0 16px rgba(255,68,102,.5)}                                                                                                               
+  .vs-sep{font-size:22px;font-weight:900;color:#4c3bd6;flex-shrink:0}                                                                                                                         
+  .winner-msg{                                                                                                                                                                                
+    font-size:15px;font-weight:700;padding:10px 16px;border-radius:8px;margin:10px 0;                                                                                                       
+    background:rgba(76,59,214,.2);border:1px solid #4c3bd6;color:#cfc9ff                                                                                                                      
+  }                                                                                                                                                                                           
+  .stat-row{display:flex;justify-content:space-between;align-items:center;                                                                                                                    
+    padding:7px 0;border-bottom:1px solid #1e1560;font-size:13px;color:#bdb7ff}                                                                                                               
+  .stat-row:last-child{border:none}                                                                                                                                                           
+  .stat-row strong{color:#fff}                                                                                                                                                                
+  .cta-box{                                                                                                                                                                                   
+    margin-top:18px;padding:16px;background:rgba(76,59,214,.18);                                                                                                                              
+    border:1px solid #4c3bd6;border-radius:10px;                                                                                                                                              
+  }                                                                                                                                                                                           
+  .cta-box p{font-size:13px;color:#cfc9ff;line-height:1.5;margin-bottom:12px}                                                                                                                 
+  hr{border:none;border-top:1px solid #1e1560;margin:12px 0}                                                                                                                                  
+  #res{display:none}                                                                                                                                                                          
+  .score-flash{                                                                                                                                                                               
+    position:fixed;font-size:26px;font-weight:900;pointer-events:none;z-index:20;                                                                                                             
+    text-shadow:0 0 12px currentColor;animation:fadeUp .9s forwards                                                                                                                           
+  }                                                                                                                                                                                           
+  @keyframes fadeUp{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-70px) scale(1.3)}}                                                                     
+  .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:16px}                                                                                                           
+  </style>                                                                                                                                                                                    
+  </head>                                                                                                                                                                                     
+  <body>                                                                                                                                                                                      
+  <canvas id="c"></canvas>                                                                                                                                                                  
+                                                                                                                                                                                              
+  <div id="hud">
+    <div class="hi"><div class="hl" id="hPlayerLbl">Your Baskets</div><div class="hv green" id="hPlayer">0</div></div>                                                                        
+    <div class="hi"><div class="hl">Attorney Baskets</div><div class="hv red" id="hAtty">0</div></div>                                                                                        
+    <div class="hsep"></div>                                                                                                                                                                  
+    <div class="hi" style="border-right:none"><div class="hl">Time Left</div><div class="hv" id="hTime">0:30</div></div>                                                                      
+  </div>                                                                                                                                                                                      
+                                                                                                                                                                                            
+  <button id="muteBtn" onclick="tcToggleMusic()">&#128266; Music</button>                                                                                                                     
+                                                                                                                                                                                            
+  <!-- OPENING OVERLAY -->                                                                                                                                                                    
+  <div class="ov" id="gate">                                                                                                                                                                
+    <div class="panel">
+      <div class="tc-logo">TechCollect AI</div>                                                                                                                                               
+      <h1 class="glow">BEAT THE ATTORNEY</h1>                                                                                                                                                 
+      <div class="sub">Make more baskets. Protect your revenue.</div>                                                                                                                         
+                                                                                                                                                                                              
+      <div class="rules">                                                                                                                                                                     
+        <p>Your mission: Make more baskets than the attorney so that you can prevent delinquencies before they cost you.</p>                                                                  
+        <p style="margin-top:10px">                                                                                                                                                           
+          <span class="tag green">+ $3.60</span> per saved unit &nbsp;|&nbsp;                                                                                                                 
+          <span class="tag red">- $2.00</span> per attorney score &nbsp;|&nbsp;                                                                                                               
+          <b>30 seconds</b> on the clock                                                                                                                                                      
+        </p>                                                                                                                                                                                  
+        <p style="margin-top:10px;font-size:12px;color:#7a6cff">                                                                                                                              
+          <b>HOW TO PLAY:</b> &nbsp;Click to shoot your ball into the hoop. Move your cursor to block the attorney's shots.                                                                   
+        </p>                                                                                                                                                                                  
+      </div>                                                                                                                                                                                  
+                                                                                                                                                                                              
+      <div id="hsForm"></div>                                                                                                                                                                 
+      <div class="warn" id="hsWarn">HubSpot could not load &mdash; fill out the form below to continue.</div>
+      <div id="fallbackForm" style="display:none;margin-top:12px">                                                                                                                            
+        <input id="fbName" placeholder="Company Name" style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid                                                                  
+  #4c3bd6;background:#0d0838;color:#fff;font-size:14px;margin-bottom:8px"/>                                                                                                                   
+        <input id="fbDoors" placeholder="Number of Units" type="number" style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid                                                
+  #4c3bd6;background:#0d0838;color:#fff;font-size:14px;margin-bottom:12px"/>                                                                                                                  
+        <button class="btn primary" onclick="tcFallbackStart()" style="width:100%">&#9654;&nbsp; I'M READY!</button>                                                                        
+      </div>                                                                                                                                                                                  
+    </div>                                                                                                                                                                                    
+  </div>                                                                                                                                                                                      
+                                                                                                                                                                                              
+  <!-- RESULTS OVERLAY -->                                                                                                                                                                    
+  <div class="ov" id="res">                                                                                                                                                                 
+    <div class="rp">
+      <div class="tc-logo">TechCollect AI &mdash; Game Over</div>
+      <h1 class="glow" style="font-size:22px;margin-bottom:2px" id="rCompany">Your Company</h1>                                                                                               
+      <div class="sub">Assessment Recovery Summary</div>                                                                                                                                      
+                                                                                                                                                                                              
+      <div class="score-vs">                                                                                                                                                                  
+        <div class="score-side player">                                                                                                                                                       
+          <div class="lbl" id="rPlayerLbl">You</div>                                                                                                                                          
+          <div class="num" id="rPlayerScore">0</div>                                                                                                                                          
+          <div style="font-size:11px;color:#00dd88;margin-top:4px">baskets</div>                                                                                                              
+        </div>                                                                                                                                                                                
+        <div class="vs-sep">VS</div>                                                                                                                                                          
+        <div class="score-side atty">                                                                                                                                                         
+          <div class="lbl">Attorney</div>                                                                                                                                                     
+          <div class="num" id="rAttyScore">0</div>                                                                                                                                            
+          <div style="font-size:11px;color:#ff4466;margin-top:4px">baskets</div>                                                                                                              
+        </div>                                                                                                                                                                                
+      </div>                                                                                                                                                                                  
+                                                                                                                                                                                              
+      <div class="winner-msg" id="rWinMsg">Results loading...</div>                                                                                                                           
+  
+      <hr/>                                                                                                                                                                                   
+      <div class="stat-row"><span>Revenue Protected</span><strong class="green" id="rProtected" style="color:#00dd88">$0.00</strong></div>                                                  
+      <div class="stat-row"><span>Revenue Lost to Attorney</span><strong style="color:#ff4466" id="rLost">$0.00</strong></div>                                                                
+      <div class="stat-row"><span>Total Potential Revenue</span><strong id="rPotential">$0.00</strong></div>                                                                                  
+      <hr/>                                                                                                                                                                                   
+      <div class="stat-row" style="font-size:15px"><span><b>Net Result</b></span><strong id="rNet" style="font-size:18px">$0.00</strong></div>                                                
+                                                                                                                                                                                              
+      <div class="cta-box">                                                                                                                                                                 
+        <p id="rMsg">With TechCollect, your company could generate an average of $3.60 in additional revenue per unit, and decrease legal actions and attorney involvement by over 90 percent.
+   Let us show you how it works and set up your free trial in under 90 minutes.</p>                                                                                                           
+        <a href="https://techcollect.ai/contact/" target="_blank" class="btn primary" style="display:inline-block;text-decoration:none;font-size:13px">
+          See How TechCollect Works &rarr;                                                                                                                                                    
+        </a>                                                                                                                                                                                
+      </div>                                                                                                                                                                                  
+                                                                                                                                                                                            
+      <div class="row">                                                                                                                                                                       
+        <button class="btn ghost" onclick="tcRestart()">Play Again</button>
+      </div>                                                                                                                                                                                  
+    </div>                                                                                                                                                                                  
+  </div>                                                                                                                                                                                      
+                                                                                                                                                                                            
+  <script charset="utf-8" type="text/javascript" src="//js.hsforms.net/forms/embed/v2.js" onerror="window.hsLoadFailed=true"></script>                                                        
+  <script>                                                                                                                                                                                  
+  (function(){                                                                                                                                                                                
+  'use strict';                                                                                                                                                                             
+                                                                                                                                                                                              
+  /* ── state ── */                                                                                                                                                                           
+  var companyName = 'Your Company';                                                                                                                                                           
+  var numDoors    = 0;                                                                                                                                                                        
+  var hsLoadFailed = false;                                                                                                                                                                   
+  var gameStarted = false;
+                                                                                                                                                                                              
+  /* ── HubSpot field extraction ── */                                                                                                                                                        
+  function extractHSData(vals){                                                                                                                                                               
+    if(!vals) return;                                                                                                                                                                         
+    console.log('[TC] HubSpot field values:', JSON.stringify(vals));                                                                                                                        
+                                                                                                                                                                                              
+    // Company name                                                                                                                                                                         
+    var c = vals.company || vals.company_name || vals.companyname ||                                                                                                                          
+            vals.organization || vals.Company || vals.COMPANY || '';                                                                                                                          
+    if(!c){                                                                                                                                                                                   
+      for(var ck in vals){                                                                                                                                                                    
+        if(ck.toLowerCase().indexOf('company') !== -1 && vals[ck]){                                                                                                                           
+          c = vals[ck]; break;                                                                                                                                                                
+        }                                                                                                                                                                                     
+      }                                                                                                                                                                                       
+    }                                                                                                                                                                                       
+    if(c && String(c).trim()) companyName = String(c).trim();
+                                                                                                                                                                                              
+    // # of Units — HubSpot strips # and converts spaces to underscores → "of_units"                                                                                                          
+    var UNIT_KEYS = [                                                                                                                                                                         
+      'of_units',                                                                                                                                                                             
+      '_of_units',                                                                                                                                                                          
+      'num_units',                                                                                                                                                                            
+      'number_of_units',                                                                                                                                                                      
+      'units',
+      'numUnits',                                                                                                                                                                             
+      'unit_count',                                                                                                                                                                         
+      'total_units',                                                                                                                                                                          
+      'unitcount',                                                                                                                                                                            
+      'number_units',                                                                                                                                                                         
+      'num_of_units',                                                                                                                                                                         
+      // legacy door fallbacks                                                                                                                                                              
+      'of_doors',                                                                                                                                                                             
+      'num_doors',
+      'number_of_doors',                                                                                                                                                                      
+      'doors',                                                                                                                                                                                
+      'numDoors'
+    ];                                                                                                                                                                                        
+    var d = 0;                                                                                                                                                                              
+                                                                                                                                                                                              
+    for(var ki = 0; ki < UNIT_KEYS.length; ki++){                                                                                                                                             
+      var candidate = parseInt(vals[UNIT_KEYS[ki]]);                                                                                                                                          
+      if(!isNaN(candidate) && candidate > 0){ d = candidate; break; }                                                                                                                         
+    }                                                                                                                                                                                       
+                                                                                                                                                                                              
+    if(!d){                                                                                                                                                                                 
+      for(var fk in vals){                                                                                                                                                                    
+        if(fk.toLowerCase().indexOf('unit') !== -1){                                                                                                                                        
+          var cv = parseInt(vals[fk]);
+          if(!isNaN(cv) && cv > 0){                                                                                                                                                           
+            console.log('[TC] Found unit count in field "'+fk+'":', cv);
+            d = cv; break;                                                                                                                                                                    
+          }                                                                                                                                                                                   
+        }                                                                                                                                                                                     
+      }                                                                                                                                                                                       
+    }                                                                                                                                                                                       
+
+    if(d) numDoors = d;
+    console.log('[TC] Stored: companyName="'+companyName+'", numUnits='+numDoors);
+  }                                                                                                                                                                                           
+  
+  function doStartGame(){                                                                                                                                                                     
+    if(gameStarted) return;                                                                                                                                                                 
+    gameStarted = true;                                                                                                                                                                       
+    document.getElementById('gate').style.display='none';                                                                                                                                     
+    startGame();
+  }                                                                                                                                                                                           
+                                                                                                                                                                                            
+  /* ── HubSpot init ── */                                                                                                                                                                    
+  function initHS(){
+    window.addEventListener('message', function(evt){                                                                                                                                         
+      try{                                                                                                                                                                                    
+        if(!evt.data) return;                                                                                                                                                                 
+        var d = (typeof evt.data === 'string') ? JSON.parse(evt.data) : evt.data;                                                                                                             
+        if(d.type === 'hsFormCallback'){                                                                                                                                                      
+          console.log('[TC] HS window message event:', d.eventName, JSON.stringify(d.data));                                                                                                  
+          if(d.eventName === 'onFormSubmitted'){                                                                                                                                              
+            if(d.data && d.data.submissionValues) extractHSData(d.data.submissionValues);                                                                                                     
+            setTimeout(doStartGame, 700);                                                                                                                                                     
+          }                                                                                                                                                                                   
+        }                                                                                                                                                                                     
+      }catch(e){}                                                                                                                                                                             
+    });                                                                                                                                                                                     
+
+    try{
+      if(typeof hbspt === 'undefined'){ showFallback(); return; }
+      hbspt.forms.create({                                                                                                                                                                    
+        portalId:'44564608',                                                                                                                                                                  
+        formId:'87eabdba-2ecc-4f7a-89f8-09a9e8b2755a',                                                                                                                                        
+        region:'na1',                                                                                                                                                                         
+        target:'#hsForm',                                                                                                                                                                     
+        onBeforeFormSubmit: function($form){                                                                                                                                                  
+          try{                                                                                                                                                                                
+            var map = {};                                                                                                                                                                     
+            if($form && $form.serializeArray){                                                                                                                                                
+              $form.serializeArray().forEach(function(o){ map[o.name]=o.value; });                                                                                                            
+            }                                                                                                                                                                                 
+            var root = ($form && $form[0]) ? $form[0] : document.getElementById('hsForm');                                                                                                    
+            var els = root ? root.querySelectorAll('input,select,textarea') : [];                                                                                                             
+            for(var i=0;i<els.length;i++){ if(els[i].name) map[els[i].name]=els[i].value; }                                                                                                   
+            console.log('[TC] onBeforeFormSubmit fields:', JSON.stringify(map));                                                                                                              
+            extractHSData(map);                                                                                                                                                               
+          }catch(e){ console.log('[TC] onBeforeFormSubmit error:', e); }                                                                                                                      
+        },                                                                                                                                                                                    
+        onFormSubmitted: function($form, data){                                                                                                                                               
+          try{                                                                                                                                                                                
+            if(data && data.submissionValues){
+              console.log('[TC] onFormSubmitted submissionValues:', JSON.stringify(data.submissionValues));                                                                                   
+              extractHSData(data.submissionValues);                                                                                                                                           
+            }                                                                                                                                                                                 
+          }catch(e){ console.log('[TC] onFormSubmitted error:', e); }                                                                                                                         
+          setTimeout(doStartGame, 700);                                                                                                                                                       
+        }                                                                                                                                                                                     
+      });                                                                                                                                                                                     
+    }catch(e){ console.log('[TC] hbspt.forms.create error:', e); showFallback(); }                                                                                                            
+  }                                                                                                                                                                                           
+  function showFallback(){
+    document.getElementById('hsWarn').style.display='block';                                                                                                                                  
+    document.getElementById('fallbackForm').style.display='block';                                                                                                                          
+  }                                                                                                                                                                                           
+  window.addEventListener('load',function(){ setTimeout(initHS, 350); });                                                                                                                     
+                                                                                                                                                                                              
+  /* ── overlay controls ── */                                                                                                                                                                
+  window.tcFallbackStart = function(){                                                                                                                                                        
+    var n = document.getElementById('fbName');                                                                                                                                                
+    var d = document.getElementById('fbDoors');                                                                                                                                               
+    if(n&&n.value.trim()) companyName = n.value.trim();                                                                                                                                       
+    if(d&&d.value&&!isNaN(+d.value)) numDoors = parseInt(d.value)||0;                                                                                                                         
+    doStartGame();                                                                                                                                                                            
+  };                                                                                                                                                                                          
+  window.tcRestart = function(){                                                                                                                                                              
+    gameStarted = false;                                                                                                                                                                    
+    document.getElementById('res').style.display = 'none';
+    document.getElementById('gate').style.display = 'flex';                                                                                                                                   
+  };                                                                                                                                                                                          
+  window.tcToggleMusic = function(){                                                                                                                                                          
+    musicMuted = !musicMuted;                                                                                                                                                                 
+    document.getElementById('muteBtn').textContent = (musicMuted?'🔇':'🔊') + ' Music';                                                                                                       
+  };                                                                                                                                                                                          
+                                                                                                                                                                                              
+  /* ── canvas ── */                                                                                                                                                                          
+  var C   = document.getElementById('c');                                                                                                                                                   
+  var ctx = C.getContext('2d');                                                                                                                                                               
+  var W, H, hudH = 42;
+  function resize(){                                                                                                                                                                          
+    W = C.width  = window.innerWidth;                                                                                                                                                         
+    H = C.height = window.innerHeight;                                                                                                                                                        
+  }                                                                                                                                                                                           
+  resize();                                                                                                                                                                                   
+  window.addEventListener('resize', function(){ resize(); if(!gameRunning) drawIdle(); });                                                                                                    
+                                                                                                                                                                                              
+  /* ── mouse ── */
+  var mx = 400, my = 400;                                                                                                                                                                     
+  window.addEventListener('mousemove', function(e){ mx=e.clientX; my=e.clientY; });                                                                                                           
+  window.addEventListener('click', function(){                                                                                                                                                
+    if(!gameRunning) return;                                                                                                                                                                  
+    if(!playerBall.active) firePlayerBall();                                                                                                                                                  
+  });                                                                                                                                                                                         
+                                                                                                                                                                                              
+  /* ── player figure position ── */                                                                                                                                                          
+  var playerFigX   = 0;                                                                                                                                                                     
+  var PLAYER_SPEED = 5;                                                                                                                                                                       
+                                                                                                                                                                                              
+  /* ── keyboard ── */
+  var keys = {};                                                                                                                                                                              
+  window.addEventListener('keydown', function(e){                                                                                                                                           
+    keys[e.key] = true;
+    if((e.key === ' ' || e.key === 'Spacebar') && gameRunning && !playerBall.active){
+      e.preventDefault();                                                                                                                                                                     
+      firePlayerBall();                                                                                                                                                                       
+    }                                                                                                                                                                                         
+    if(e.key==='ArrowLeft'||e.key==='ArrowRight'||e.key===' ') e.preventDefault();                                                                                                            
+  });                                                                                                                                                                                         
+  window.addEventListener('keyup', function(e){ keys[e.key] = false; });                                                                                                                    
+                                                                                                                                                                                              
+  /* ── game state ── */                                                                                                                                                                    
+  var gameRunning  = false;                                                                                                                                                                   
+  var timeLeft     = 30;                                                                                                                                                                    
+  var timerInterval= null;                                                                                                                                                                    
+  var playerScore  = 0;                                                                                                                                                                       
+  var attScore     = 0;                                                                                                                                                                       
+  var animId       = null;                                                                                                                                                                    
+  var lastTime     = 0;                                                                                                                                                                       
+  
+  /* ── ball objects ── */                                                                                                                                                                    
+  var playerBall = {x:0,y:0,vx:0,vy:0,r:16,active:false,scored:false,trail:[]};                                                                                                             
+  var attBall    = {x:0,y:0,vx:0,vy:0,r:16,active:false,scored:false,trail:[]};                                                                                                               
+                                                                                                                                                                                              
+  /* ── blocker ── */                                                                                                                                                                         
+  var BLOCKER_W = 100, BLOCKER_H = 18;                                                                                                                                                        
+                                                                                                                                                                                              
+  /* ── attorney AI ── */
+  var attFig = { x:0, y:0, dir:1, speed:1.1 };                                                                                                                                                
+  var lastAttShot = 0;                                                                                                                                                                        
+  var attShotInterval = 3200;                                                                                                                                                                 
+                                                                                                                                                                                              
+  /* ── roundRect polyfill ── */                                                                                                                                                              
+  if(!CanvasRenderingContext2D.prototype.roundRect){                                                                                                                                        
+    CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h,r){                                                                                                                         
+      r=Math.min(r,w/2,h/2);                                                                                                                                                                  
+      this.beginPath();                                                                                                                                                                       
+      this.moveTo(x+r,y);                                                                                                                                                                     
+      this.lineTo(x+w-r,y); this.quadraticCurveTo(x+w,y,x+w,y+r);                                                                                                                             
+      this.lineTo(x+w,y+h-r); this.quadraticCurveTo(x+w,y+h,x+w-r,y+h);                                                                                                                       
+      this.lineTo(x+r,y+h); this.quadraticCurveTo(x,y+h,x,y+h-r);                                                                                                                             
+      this.lineTo(x,y+r); this.quadraticCurveTo(x,y,x+r,y);                                                                                                                                   
+      this.closePath(); return this;                                                                                                                                                          
+    };                                                                                                                                                                                        
+  }                                                                                                                                                                                         
+                                                                                                                                                                                              
+  /* ── hoop ── */                                                                                                                                                                          
+  var HOOP_R = 34;
+  var GRAVITY = 0.13;                                                                                                                                                                         
+  function getHoop(){                                                                                                                                                                         
+    return { x: W*0.5, y: hudH + (H-hudH)*0.22 };                                                                                                                                             
+  }                                                                                                                                                                                           
+  function getFigY(){                                                                                                                                                                       
+    return hudH + (H-hudH)*0.80;                                                                                                                                                              
+  }                                                                                                                                                                                           
+  function getPlayerFigX(){                                                                                                                                                                   
+    return playerFigX;                                                                                                                                                                        
+  }                                                                                                                                                                                           
+                                                                                                                                                                                              
+  /* ── shot physics ── */                                                                                                                                                                    
+  function calcShot(fx, fy, tx, ty, tFrames){                                                                                                                                               
+    return {                                                                                                                                                                                  
+      vx: (tx - fx) / tFrames,
+      vy: (ty - fy) / tFrames - 0.5 * GRAVITY * tFrames                                                                                                                                       
+    };                                                                                                                                                                                        
+  }                                                                                                                                                                                           
+                                                                                                                                                                                              
+  function getShotTFrames(fy, ty, extraFactor){                                                                                                                                               
+    var dy = Math.max(fy - ty, 50);
+    var tMin = Math.sqrt(2 * dy / GRAVITY);                                                                                                                                                   
+    return Math.ceil(tMin * (extraFactor || 1.25));                                                                                                                                           
+  }                                                                                                                                                                                           
+                                                                                                                                                                                              
+  /* ── fire player ball ── */                                                                                                                                                                
+  function firePlayerBall(){                                                                                                                                                                
+    var h = getHoop();                                                                                                                                                                        
+    var fx = getPlayerFigX(), fy = getFigY() - 30;                                                                                                                                            
+    var t = getShotTFrames(fy, h.y, 1.25);                                                                                                                                                    
+    var tx = h.x + (Math.random()-0.5)*12;                                                                                                                                                    
+    var ty = h.y + (Math.random()-0.5)*12;                                                                                                                                                    
+    var v = calcShot(fx, fy, tx, ty, t);                                                                                                                                                      
+    playerBall.x = fx; playerBall.y = fy;                                                                                                                                                     
+    playerBall.vx = v.vx; playerBall.vy = v.vy;                                                                                                                                               
+    playerBall.active = true; playerBall.scored = false; playerBall.trail = [];                                                                                                             
+  }                                                                                                                                                                                           
+                                                                                                                                                                                            
+  /* ── fire attorney ball ── */                                                                                                                                                              
+  function fireAttBall(){                                                                                                                                                                   
+    var h = getHoop();                                                                                                                                                                        
+    var fx = attFig.x, fy = getFigY() - 30;                                                                                                                                                   
+    var t = getShotTFrames(fy, h.y, 1.42);                                                                                                                                                    
+    var spread = 58;                                                                                                                                                                          
+    var tx = h.x + (Math.random()-0.5)*spread;                                                                                                                                              
+    var ty = h.y + (Math.random()-0.5)*spread;                                                                                                                                                
+    var v = calcShot(fx, fy, tx, ty, t);                                                                                                                                                      
+    attBall.x = fx; attBall.y = fy;
+    attBall.vx = v.vx; attBall.vy = v.vy;                                                                                                                                                     
+    attBall.active = true; attBall.scored = false; attBall.trail = [];                                                                                                                        
+  }
+                                                                                                                                                                                              
+  /* ── update ball ── */                                                                                                                                                                     
+  function updateBall(b, side, ts){
+    if(!b.active) return;                                                                                                                                                                     
+    b.trail.push({x:b.x, y:b.y});                                                                                                                                                           
+    if(b.trail.length > 14) b.trail.shift();                                                                                                                                                  
+                                                                                                                                                                                              
+    b.vy += GRAVITY;
+    b.x  += b.vx;                                                                                                                                                                             
+    b.y  += b.vy;                                                                                                                                                                             
+  
+    if(b.x - b.r < 0)  { b.x = b.r;   b.vx = Math.abs(b.vx); }                                                                                                                                
+    if(b.x + b.r > W)  { b.x = W-b.r; b.vx = -Math.abs(b.vx); }                                                                                                                             
+    if(b.y - b.r < hudH){ b.y = hudH+b.r; b.vy = Math.abs(b.vy)*0.6; }                                                                                                                        
+                                                                                                                                                                                              
+    if(side === 'atty' && !b.scored){                                                                                                                                                         
+      var bx=mx, by=my;                                                                                                                                                                       
+      var hw=BLOCKER_W/2, hh=BLOCKER_H/2;                                                                                                                                                     
+      if(b.x>bx-hw-b.r && b.x<bx+hw+b.r && b.y>by-hh-b.r && b.y<by+hh+b.r){                                                                                                                   
+        var off = (b.x-bx)/hw;                                                                                                                                                                
+        b.vy = -Math.abs(b.vy)*1.05;                                                                                                                                                          
+        b.vx = off * 7;                                                                                                                                                                       
+        if(Math.abs(b.vy)<3) b.vy = -3;                                                                                                                                                       
+        showFlash('BLOCKED!','#7a6cff', b.x, b.y-45);                                                                                                                                         
+      }                                                                                                                                                                                       
+    }                                                                                                                                                                                         
+                                                                                                                                                                                              
+    if(!b.scored){                                                                                                                                                                          
+      var h = getHoop();
+      var dx = b.x-h.x, dy = b.y-h.y;                                                                                                                                                         
+      if(Math.sqrt(dx*dx+dy*dy) < HOOP_R && b.vy > -3){                                                                                                                                       
+        b.scored = true; b.active = false; b.trail = [];                                                                                                                                      
+        if(side === 'player'){                                                                                                                                                                
+          playerScore++;                                                                                                                                                                      
+          showFlash('+1 \u2713','#00dd88', h.x, h.y-60);                                                                                                                                      
+          playScore('good');                                                                                                                                                                  
+        } else {                                                                                                                                                                              
+          attScore++;                                                                                                                                                                         
+          showFlash('-1 \u2717','#ff4466', h.x, h.y-60);                                                                                                                                      
+          playScore('bad');                                                                                                                                                                   
+        }                                                                                                                                                                                     
+        updateHUD();                                                                                                                                                                          
+        if(side === 'atty') lastAttShot = ts;                                                                                                                                                 
+      }                                                                                                                                                                                       
+    }                                                                                                                                                                                         
+                                                                                                                                                                                              
+    if(b.y > H + 60){                                                                                                                                                                         
+      b.active = false; b.trail = [];
+      if(side === 'atty') lastAttShot = ts;                                                                                                                                                   
+    }                                                                                                                                                                                         
+  }                                                                                                                                                                                           
+                                                                                                                                                                                              
+  /* ── game tick ── */                                                                                                                                                                       
+  function gameTick(ts){
+    if(!gameRunning) return;                                                                                                                                                                  
+    lastTime = ts;                                                                                                                                                                          
+                                                                                                                                                                                              
+    var minX = W * 0.52, maxX = W * 0.94;                                                                                                                                                     
+    if(keys['ArrowLeft']  || keys['a'] || keys['A']){                                                                                                                                         
+      playerFigX = Math.max(minX, playerFigX - PLAYER_SPEED);                                                                                                                                 
+    }                                                                                                                                                                                       
+    if(keys['ArrowRight'] || keys['d'] || keys['D']){                                                                                                                                         
+      playerFigX = Math.min(maxX, playerFigX + PLAYER_SPEED);                                                                                                                                 
+    }                                                                                                                                                                                         
+                                                                                                                                                                                              
+    attFig.x += attFig.dir * attFig.speed;                                                                                                                                                    
+    if(attFig.x > W*0.38) attFig.dir = -1;
+    if(attFig.x < W*0.12) attFig.dir =  1;                                                                                                                                                    
+                                                                                                                                                                                            
+    if(!attBall.active && ts - lastAttShot > attShotInterval){                                                                                                                                
+      fireAttBall();                                                                                                                                                                        
+      lastAttShot = ts;                                                                                                                                                                       
+      attShotInterval = 2800 + Math.random()*1800;                                                                                                                                            
+    }                                                                                                                                                                                         
+                                                                                                                                                                                              
+    updateBall(playerBall, 'player', ts);                                                                                                                                                     
+    updateBall(attBall,    'atty',   ts);                                                                                                                                                   
+                                                                                                                                                                                              
+    draw(ts);                                                                                                                                                                                 
+    animId = requestAnimationFrame(gameTick);                                                                                                                                                 
+  }                                                                                                                                                                                           
+                                                                                                                                                                                            
+  /* ── drawing ── */                                                                                                                                                                         
+  function draw(ts){
+    ctx.clearRect(0,0,W,H);                                                                                                                                                                   
+    drawCourt();                                                                                                                                                                            
+    drawHoopObj(getHoop());                                                                                                                                                                   
+    drawAttorneyFig();                                                                                                                                                                        
+    drawPlayerFig();                                                                                                                                                                          
+    if(attBall.active)    drawBallObj(attBall,    '#ff6633');                                                                                                                                 
+    if(playerBall.active) drawBallObj(playerBall, '#ff9922');                                                                                                                                 
+    drawBlocker();                                                                                                                                                                            
+    if(!playerBall.active && gameRunning) drawShootHint();                                                                                                                                    
+  }                                                                                                                                                                                           
+                                                                                                                                                                                            
+  function drawIdle(){                                                                                                                                                                        
+    ctx.clearRect(0,0,W,H);                                                                                                                                                                 
+    attFig.x = W*0.26; attFig.y = getFigY();                                                                                                                                                  
+    playerFigX = W * 0.74;                                                                                                                                                                    
+    drawCourt();                                                                                                                                                                              
+    drawHoopObj(getHoop());                                                                                                                                                                   
+    drawAttorneyFig();                                                                                                                                                                        
+    drawPlayerFig();                                                                                                                                                                          
+  }                                                                                                                                                                                           
+                                                                                                                                                                                              
+  /* ── court ── */                                                                                                                                                                         
+  function drawCourt(){
+    var grad = ctx.createLinearGradient(0,hudH,0,H);                                                                                                                                          
+    grad.addColorStop(0,'#0e0840');                                                                                                                                                           
+    grad.addColorStop(1,'#060318');                                                                                                                                                           
+    ctx.fillStyle = grad;                                                                                                                                                                     
+    ctx.fillRect(0,hudH,W,H-hudH);                                                                                                                                                            
+                                                                                                                                                                                              
+    ctx.save();
+    ctx.strokeStyle = 'rgba(42,27,143,0.45)';                                                                                                                                                 
+    ctx.lineWidth = 1.5;                                                                                                                                                                      
+    var mid = (hudH+H)/2;
+    ctx.beginPath(); ctx.arc(W/2,mid,70,0,Math.PI*2); ctx.stroke();                                                                                                                           
+    ctx.beginPath(); ctx.moveTo(W/2,hudH); ctx.lineTo(W/2,H); ctx.stroke();                                                                                                                   
+    var kw=W*0.18, kh=(H-hudH)*0.42;                                                                                                                                                          
+    ctx.strokeRect(0,mid-kh/2,kw,kh);                                                                                                                                                         
+    ctx.strokeRect(W-kw,mid-kh/2,kw,kh);                                                                                                                                                      
+    ctx.beginPath(); ctx.arc(W*0.14,mid,kh*0.58,Math.PI*1.5,Math.PI*0.5); ctx.stroke();                                                                                                       
+    ctx.beginPath(); ctx.arc(W*0.86,mid,kh*0.58,Math.PI*0.5,Math.PI*1.5); ctx.stroke();                                                                                                       
+    ctx.restore();                                                                                                                                                                            
+                                                                                                                                                                                              
+    ctx.save();                                                                                                                                                                               
+    ctx.strokeStyle='rgba(76,59,214,0.12)';                                                                                                                                                   
+    ctx.lineWidth=1;                                                                                                                                                                          
+    for(var i=0;i<8;i++){                                                                                                                                                                     
+      ctx.beginPath();                                                                                                                                                                        
+      ctx.moveTo(0,hudH+(H-hudH)*i/7);                                                                                                                                                        
+      ctx.lineTo(W,hudH+(H-hudH)*i/7);                                                                                                                                                        
+      ctx.stroke();                                                                                                                                                                           
+    }                                                                                                                                                                                         
+    ctx.restore();                                                                                                                                                                            
+  }                                                                                                                                                                                           
+  
+  /* ── hoop ── */                                                                                                                                                                            
+  function drawHoopObj(h){                                                                                                                                                                  
+    var x=h.x, y=h.y;                                                                                                                                                                         
+    var rimW=48, netH=40;
+    ctx.save();                                                                                                                                                                               
+                                                                                                                                                                                            
+    ctx.fillStyle='rgba(30,15,100,0.85)';                                                                                                                                                     
+    ctx.strokeStyle='#7a6cff';                                                                                                                                                              
+    ctx.lineWidth=3;                                                                                                                                                                          
+    ctx.fillRect(x-60,y-55,120,14);                                                                                                                                                         
+    ctx.strokeRect(x-60,y-55,120,14);                                                                                                                                                         
+  
+    ctx.strokeStyle='rgba(100,90,200,0.5)';                                                                                                                                                   
+    ctx.lineWidth=4;                                                                                                                                                                        
+    ctx.beginPath(); ctx.moveTo(x,y-41); ctx.lineTo(x,y); ctx.stroke();                                                                                                                       
+                                                                                                                                                                                              
+    ctx.strokeStyle='#ffda78';                                                                                                                                                                
+    ctx.lineWidth=5;                                                                                                                                                                          
+    ctx.shadowColor='#ffda78'; ctx.shadowBlur=16;                                                                                                                                             
+    ctx.beginPath(); ctx.ellipse(x,y,rimW/2,10,0,0,Math.PI*2); ctx.stroke();                                                                                                                
+    ctx.shadowBlur=0;                                                                                                                                                                         
+                                                                                                                                                                                              
+    ctx.strokeStyle='rgba(255,255,255,0.28)';                                                                                                                                                 
+    ctx.lineWidth=1;                                                                                                                                                                          
+    for(var i=0;i<9;i++){                                                                                                                                                                     
+      var angle=(i/9)*Math.PI*2;                                                                                                                                                              
+      ctx.beginPath();                                                                                                                                                                        
+      ctx.moveTo(x+Math.cos(angle)*rimW/2, y+Math.sin(angle)*10);                                                                                                                             
+      ctx.lineTo(x+Math.cos(angle)*6, y+netH);                                                                                                                                                
+      ctx.stroke();                                                                                                                                                                           
+    }                                                                                                                                                                                         
+    ctx.beginPath(); ctx.ellipse(x,y+netH,8,4,0,0,Math.PI*2); ctx.stroke();                                                                                                                 
+                                                                                                                                                                                              
+    ctx.strokeStyle = 'rgba(255,218,120,0.18)';                                                                                                                                               
+    ctx.lineWidth = 1;                                                                                                                                                                        
+    ctx.setLineDash([3,5]);                                                                                                                                                                   
+    ctx.beginPath(); ctx.arc(x, y, HOOP_R, 0, Math.PI*2); ctx.stroke();                                                                                                                       
+    ctx.setLineDash([]);                                                                                                                                                                      
+                                                                                                                                                                                              
+    ctx.font='bold 12px sans-serif';                                                                                                                                                          
+    ctx.textAlign='center';                                                                                                                                                                 
+    ctx.fillStyle='#ffda78';                                                                                                                                                                  
+    ctx.shadowColor='#ffda78'; ctx.shadowBlur=8;                                                                                                                                              
+    ctx.fillText('SCORE HERE',x,y-62);                                                                                                                                                        
+    ctx.shadowBlur=0;                                                                                                                                                                         
+    ctx.restore();                                                                                                                                                                            
+  }                                                                                                                                                                                         
+                                                                                                                                                                                              
+  /* ── attorney figure ── */                                                                                                                                                               
+  function drawAttorneyFig(){
+    var sx=attFig.x, sy=getFigY();
+    ctx.save();                                                                                                                                                                               
+    ctx.fillStyle='#1a0a3a'; ctx.strokeStyle='#ff4466'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.roundRect(sx-14,sy-36,28,42,4); ctx.fill(); ctx.stroke();                                                                                                            
+    ctx.fillStyle='#2a1b5a'; ctx.strokeStyle='#ff4466';                                                                                                                                       
+    ctx.beginPath(); ctx.arc(sx,sy-44,13,0,Math.PI*2); ctx.fill(); ctx.stroke();                                                                                                              
+    ctx.fillStyle='#3a2060'; ctx.strokeStyle='#ff4466'; ctx.lineWidth=1.5;                                                                                                                    
+    ctx.fillRect(sx+12,sy-24,16,12); ctx.strokeRect(sx+12,sy-24,16,12);                                                                                                                       
+    ctx.beginPath(); ctx.moveTo(sx+15,sy-24); ctx.lineTo(sx+15,sy-27); ctx.lineTo(sx+24,sy-27); ctx.lineTo(sx+24,sy-24); ctx.stroke();                                                        
+    ctx.fillStyle='#ff4466'; ctx.shadowColor='#ff4466'; ctx.shadowBlur=6;                                                                                                                     
+    ctx.beginPath(); ctx.arc(sx-4,sy-45,2.5,0,Math.PI*2); ctx.fill();                                                                                                                         
+    ctx.beginPath(); ctx.arc(sx+4,sy-45,2.5,0,Math.PI*2); ctx.fill();                                                                                                                         
+    ctx.shadowBlur=0;                                                                                                                                                                         
+    ctx.font='bold 10px sans-serif'; ctx.textAlign='center'; ctx.fillStyle='#ff4466';                                                                                                         
+    ctx.shadowColor='#ff4466'; ctx.shadowBlur=5;                                                                                                                                              
+    ctx.fillText('ATTORNEY',sx,sy+14);                                                                                                                                                      
+    ctx.shadowBlur=0;                                                                                                                                                                         
+    ctx.restore();                                                                                                                                                                          
+  }                                                                                                                                                                                           
+                                                                                                                                                                                            
+  /* ── player figure ── */
+  function drawPlayerFig(){
+    var sx=getPlayerFigX(), sy=getFigY();
+    ctx.save();                                                                                                                                                                               
+    ctx.fillStyle='#0d1a40'; ctx.strokeStyle='#00dd88'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.roundRect(sx-14,sy-36,28,42,4); ctx.fill(); ctx.stroke();                                                                                                            
+    ctx.fillStyle='#1a2a50'; ctx.strokeStyle='#00dd88';                                                                                                                                     
+    ctx.beginPath(); ctx.arc(sx,sy-44,13,0,Math.PI*2); ctx.fill(); ctx.stroke();                                                                                                              
+    ctx.fillStyle='#1a3060'; ctx.strokeStyle='#00dd88'; ctx.lineWidth=1.5;                                                                                                                    
+    ctx.fillRect(sx-28,sy-26,14,18); ctx.strokeRect(sx-28,sy-26,14,18);                                                                                                                       
+    ctx.fillStyle='#00dd88'; ctx.shadowColor='#00dd88'; ctx.shadowBlur=6;                                                                                                                     
+    ctx.beginPath(); ctx.arc(sx-4,sy-45,2.5,0,Math.PI*2); ctx.fill();                                                                                                                         
+    ctx.beginPath(); ctx.arc(sx+4,sy-45,2.5,0,Math.PI*2); ctx.fill();                                                                                                                         
+    ctx.shadowBlur=0;                                                                                                                                                                         
+    ctx.font='bold 10px sans-serif'; ctx.textAlign='center'; ctx.fillStyle='#00dd88';                                                                                                         
+    ctx.shadowColor='#00dd88'; ctx.shadowBlur=5;                                                                                                                                              
+    var shortName = companyName.length>12 ? companyName.slice(0,11)+'…' : companyName;                                                                                                        
+    ctx.fillText(shortName,sx,sy+14);                                                                                                                                                         
+    ctx.shadowBlur=0;                                                                                                                                                                         
+    ctx.restore();                                                                                                                                                                            
+  }                                                                                                                                                                                         
+                                                                                                                                                                                              
+  /* ── ball drawing ── */                                                                                                                                                                    
+  function drawBallObj(b, tintColor){
+    for(var i=0;i<b.trail.length;i++){                                                                                                                                                        
+      var t=b.trail[i];                                                                                                                                                                       
+      ctx.save();
+      ctx.globalAlpha=(i/b.trail.length)*0.3;                                                                                                                                                 
+      ctx.fillStyle=tintColor||'#ff8844';                                                                                                                                                     
+      ctx.beginPath(); ctx.arc(t.x,t.y,b.r*(i/b.trail.length)*0.75,0,Math.PI*2); ctx.fill();                                                                                                  
+      ctx.restore();                                                                                                                                                                          
+    }                                                                                                                                                                                         
+    var x=b.x, y=b.y, r=b.r;                                                                                                                                                                  
+    ctx.save();                                                                                                                                                                               
+    var grad=ctx.createRadialGradient(x-r*0.3,y-r*0.3,r*0.1,x,y,r);                                                                                                                           
+    grad.addColorStop(0,'#ffaa55');                                                                                                                                                           
+    grad.addColorStop(0.6,'#e86a00');                                                                                                                                                         
+    grad.addColorStop(1,'#8b3a00');                                                                                                                                                           
+    ctx.fillStyle=grad;                                                                                                                                                                       
+    ctx.shadowColor='rgba(230,100,0,0.5)'; ctx.shadowBlur=12;                                                                                                                                 
+    ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();                                                                                                                                  
+    ctx.strokeStyle='rgba(100,30,0,0.65)'; ctx.lineWidth=1.5; ctx.shadowBlur=0;                                                                                                               
+    ctx.beginPath(); ctx.moveTo(x,y-r); ctx.bezierCurveTo(x+r*0.5,y-r*0.2,x+r*0.5,y+r*0.2,x,y+r); ctx.stroke();                                                                               
+    ctx.beginPath(); ctx.moveTo(x,y-r); ctx.bezierCurveTo(x-r*0.5,y-r*0.2,x-r*0.5,y+r*0.2,x,y+r); ctx.stroke();                                                                               
+    ctx.beginPath(); ctx.moveTo(x-r,y); ctx.bezierCurveTo(x-r*0.2,y+r*0.5,x+r*0.2,y+r*0.5,x+r,y); ctx.stroke();                                                                               
+    ctx.restore();                                                                                                                                                                            
+  }                                                                                                                                                                                           
+                                                                                                                                                                                              
+  /* ── blocker / cursor ── */                                                                                                                                                              
+  function drawBlocker(){
+    var x=mx, y=my;                                                                                                                                                                           
+    var w=BLOCKER_W, h2=BLOCKER_H;                                                                                                                                                            
+    ctx.save();                                                                                                                                                                               
+    ctx.shadowColor='#7a6cff'; ctx.shadowBlur=20;                                                                                                                                             
+    var grad=ctx.createLinearGradient(x-w/2,y,x+w/2,y);                                                                                                                                       
+    grad.addColorStop(0,'#4c3bd6'); grad.addColorStop(0.5,'#7a6cff'); grad.addColorStop(1,'#4c3bd6');                                                                                         
+    ctx.fillStyle=grad;                                                                                                                                                                       
+    ctx.beginPath(); ctx.roundRect(x-w/2,y-h2/2,w,h2,h2/2); ctx.fill();                                                                                                                       
+    ctx.strokeStyle='#cfc9ff'; ctx.lineWidth=2; ctx.stroke();                                                                                                                                 
+    ctx.shadowBlur=0;                                                                                                                                                                         
+    ctx.font='bold 8px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';                                                                                                        
+    ctx.fillStyle='rgba(255,255,255,0.85)'; ctx.fillText('TC SHIELD',x,y);                                                                                                                    
+    ctx.textBaseline='alphabetic';                                                                                                                                                            
+    ctx.fillStyle='#fff'; ctx.shadowColor='#fff'; ctx.shadowBlur=8;                                                                                                                           
+    ctx.beginPath(); ctx.arc(x,y,3,0,Math.PI*2); ctx.fill();                                                                                                                                  
+    ctx.shadowBlur=0;                                                                                                                                                                         
+    ctx.restore();                                                                                                                                                                            
+  }                                                                                                                                                                                           
+                                                                                                                                                                                            
+  function drawShootHint(){
+    var h   = getHoop();
+    var fx  = getPlayerFigX(), fy = getFigY() - 30;                                                                                                                                           
+    var t   = getShotTFrames(fy, h.y, 1.25);
+    var v   = calcShot(fx, fy, h.x, h.y, t);                                                                                                                                                  
+                                                                                                                                                                                            
+    ctx.save();                                                                                                                                                                               
+    ctx.strokeStyle = 'rgba(0,221,136,0.22)';                                                                                                                                               
+    ctx.lineWidth   = 2;                                                                                                                                                                      
+    ctx.setLineDash([5, 8]);                                                                                                                                                                  
+    ctx.beginPath();                                                                                                                                                                          
+    ctx.moveTo(fx, fy);                                                                                                                                                                       
+    var steps = Math.ceil(t / 3);                                                                                                                                                             
+    for(var i = 1; i <= steps; i++){                                                                                                                                                          
+      var ti = i * 3;                                                                                                                                                                         
+      var px = fx + v.vx * ti;                                                                                                                                                                
+      var py = fy + v.vy * ti + 0.5 * GRAVITY * ti * ti;                                                                                                                                      
+      if(py > H) break;                                                                                                                                                                       
+      ctx.lineTo(px, py);                                                                                                                                                                     
+    }                                                                                                                                                                                         
+    ctx.stroke();                                                                                                                                                                             
+    ctx.setLineDash([]);                                                                                                                                                                    
+    ctx.restore();
+                                                                                                                                                                                              
+    var fy2 = getFigY();                                                                                                                                                                      
+    ctx.save();                                                                                                                                                                               
+    ctx.textAlign = 'center';                                                                                                                                                                 
+    ctx.font = 'bold 11px sans-serif';                                                                                                                                                        
+    ctx.fillStyle = 'rgba(0,221,136,0.9)';
+    ctx.fillText('CLICK / SPACE to shoot', fx, fy2 - 62);                                                                                                                                     
+    ctx.font = '10px sans-serif';                                                                                                                                                             
+    ctx.fillStyle = 'rgba(0,221,136,0.5)';
+    ctx.fillText('\u2190 A / D \u2192  move', fx, fy2 - 48);                                                                                                                                  
+    ctx.restore();                                                                                                                                                                            
+  }
+                                                                                                                                                                                              
+  /* ── score flash ── */                                                                                                                                                                   
+  function showFlash(txt,color,x,y){
+    var el=document.createElement('div');                                                                                                                                                     
+    el.className='score-flash';                                                                                                                                                               
+    el.style.color=color; el.style.left=x+'px'; el.style.top=y+'px';                                                                                                                          
+    el.style.transform='translateX(-50%)';                                                                                                                                                    
+    el.textContent=txt;                                                                                                                                                                       
+    document.body.appendChild(el);                                                                                                                                                            
+    setTimeout(function(){try{el.remove();}catch(e){}},900);                                                                                                                                  
+  }                                                                                                                                                                                         
+                                                                                                                                                                                              
+  /* ── HUD ── */                                                                                                                                                                           
+  function updateHUD(){
+    document.getElementById('hPlayer').textContent=playerScore;                                                                                                                               
+    document.getElementById('hAtty').textContent=attScore;                                                                                                                                    
+    var n=companyName.length>14?companyName.slice(0,13)+'…':companyName;                                                                                                                      
+    document.getElementById('hPlayerLbl').textContent=n+' Baskets';                                                                                                                           
+  }                                                                                                                                                                                           
+  function updateTimer(){                                                                                                                                                                     
+    var m=Math.floor(timeLeft/60), s=timeLeft%60;                                                                                                                                             
+    document.getElementById('hTime').textContent=m+':'+(s<10?'0':'')+s;                                                                                                                       
+  }                                                                                                                                                                                           
+                                                                                                                                                                                              
+  /* ── game flow ── */                                                                                                                                                                       
+  function startGame(){                                                                                                                                                                       
+    gameStarted=true;                                                                                                                                                                       
+    playerScore=0; attScore=0; timeLeft=30;
+    playerBall.active=false; playerBall.trail=[];                                                                                                                                             
+    attBall.active=false; attBall.trail=[];                                                                                                                                                   
+    lastAttShot=-9999; attShotInterval=3000;                                                                                                                                                  
+    attFig.x=W*0.26; attFig.y=getFigY(); attFig.dir=1;                                                                                                                                        
+    playerFigX = W * 0.74;                                                                                                                                                                    
+    gameRunning=true;                                                                                                                                                                         
+    updateHUD(); updateTimer();                                                                                                                                                               
+    timerInterval=setInterval(function(){                                                                                                                                                     
+      timeLeft--;
+      updateTimer();                                                                                                                                                                          
+      if(timeLeft<=0) endGame();                                                                                                                                                            
+    },1000);                                                                                                                                                                                  
+    lastTime=performance.now();
+    animId=requestAnimationFrame(gameTick);                                                                                                                                                   
+    startMusic();                                                                                                                                                                             
+  }
+                                                                                                                                                                                              
+  function endGame(){                                                                                                                                                                       
+    gameRunning=false;
+    clearInterval(timerInterval);
+    if(animId) cancelAnimationFrame(animId);                                                                                                                                                  
+    playerBall.active=false; attBall.active=false;                                                                                                                                            
+    stopMusic();                                                                                                                                                                              
+    setTimeout(showResults, 400);                                                                                                                                                             
+  }                                                                                                                                                                                           
+                                                                                                                                                                                            
+  function showResults(){
+    var doors       = numDoors > 0 ? numDoors : (playerScore + attScore);
+    var protected_  = playerScore * 3.60;                                                                                                                                                     
+    var lost_       = attScore   * 2.00;                                                                                                                                                      
+    var potential   = doors      * 3.60;                                                                                                                                                      
+    var net         = protected_ - lost_;                                                                                                                                                     
+    var playerWins  = playerScore > attScore;                                                                                                                                                 
+    var tie         = playerScore === attScore;                                                                                                                                               
+                                                                                                                                                                                            
+    document.getElementById('rCompany').textContent = companyName;                                                                                                                            
+    var shortName = companyName.length > 16 ? companyName.slice(0,15)+'…' : companyName;                                                                                                    
+    document.getElementById('rPlayerLbl').textContent = shortName;                                                                                                                            
+    document.getElementById('rPlayerScore').textContent = playerScore;                                                                                                                      
+    document.getElementById('rAttyScore').textContent   = attScore;                                                                                                                           
+                                                                                                                                                                                              
+    var winMsg = tie                                                                                                                                                                          
+      ? "It's a tie — every unit is still at risk. TechCollect can tip the balance."                                                                                                          
+      : playerWins                                                                                                                                                                            
+        ? companyName + ' protected the community\'s revenue. Well played!'                                                                                                                 
+        : 'Attorney fees got the upper hand this time. TechCollect can change that.';                                                                                                         
+    var wm = document.getElementById('rWinMsg');                                                                                                                                              
+    wm.textContent    = winMsg;                                                                                                                                                               
+    wm.style.borderColor = tie ? '#4c3bd6' : playerWins ? 'rgba(0,221,136,.4)' : 'rgba(255,68,102,.4)';                                                                                       
+    wm.style.color       = tie ? '#cfc9ff' : playerWins ? '#00dd88'             : '#ff8899';                                                                                                  
+                                                                                                                                                                                              
+    document.getElementById('rProtected').textContent = '$' + protected_.toFixed(2);                                                                                                          
+    document.getElementById('rLost').textContent      = '$' + lost_.toFixed(2);                                                                                                               
+    document.getElementById('rPotential').textContent = '$' + potential.toFixed(2) +                                                                                                          
+      (doors > 0 ? ' (' + doors + ' units \u00d7 $3.60)' : '');
+    var netEl = document.getElementById('rNet');                                                                                                                                              
+    netEl.textContent = (net >= 0 ? '+ ' : '- ') + '$' + Math.abs(net).toFixed(2);                                                                                                          
+    netEl.style.color = net >= 0 ? '#00dd88' : '#ff4466';                                                                                                                                     
+                                                                                                                                                                                              
+    var msg = 'With TechCollect, ' + companyName + ' could generate an average of $3.60 in additional revenue per unit,' +                                                                    
+      ' and decrease legal actions and attorney involvement by over 90 percent.' +                                                                                                            
+      ' Let us show you how it works and set up your free trial in under 90 minutes.';                                                                                                        
+    document.getElementById('rMsg').textContent = msg;                                                                                                                                        
+                                                                                                                                                                                              
+    document.getElementById('res').style.display = 'flex';                                                                                                                                    
+  }                                                                                                                                                                                           
+                                                                                                                                                                                              
+  /* ── music ── */                                                                                                                                                                           
+  var audioCtx=null, musicMuted=false, musicInterval=null, musicBeat=0;
+  var BPM=128;                                                                                                                                                                                
+  var MELODY=[523,392,329,523,392,440,392,329,523,659,523,440,392,329,261,392];                                                                                                               
+                                                                                                                                                                                              
+  function getAC(){                                                                                                                                                                           
+    if(!audioCtx) try{ audioCtx=new(window.AudioContext||window.webkitAudioContext)(); }catch(e){}                                                                                            
+    return audioCtx;                                                                                                                                                                          
+  }
+  function startMusic(){                                                                                                                                                                      
+    var ac=getAC(); if(!ac) return;                                                                                                                                                         
+    stopMusic();                                                                                                                                                                              
+    musicBeat=0;                                                                                                                                                                              
+    var stepMs=Math.round(60000/BPM/2);                                                                                                                                                       
+    musicInterval=setInterval(function(){                                                                                                                                                     
+      if(!musicMuted){ playStep(musicBeat%16); }                                                                                                                                              
+      musicBeat++;                                                                                                                                                                            
+    }, stepMs);                                                                                                                                                                               
+  }                                                                                                                                                                                           
+  function stopMusic(){                                                                                                                                                                     
+    if(musicInterval){ clearInterval(musicInterval); musicInterval=null; }
+  }                                                                                                                                                                                           
+  function playStep(b){
+    var ac=getAC(); if(!ac) return;                                                                                                                                                           
+    if(b===0||b===4||b===8||b===12) playKick(ac);                                                                                                                                           
+    if(b===4||b===12) playSnare(ac);                                                                                                                                                          
+    playHat(ac);                                                                                                                                                                              
+    if(b%2===0) playMelody(ac, MELODY[b/2]||392);                                                                                                                                             
+  }                                                                                                                                                                                           
+  function playKick(ac){                                                                                                                                                                    
+    try{                                                                                                                                                                                      
+      var o=ac.createOscillator(), g=ac.createGain();                                                                                                                                       
+      o.connect(g); g.connect(ac.destination);                                                                                                                                                
+      o.frequency.setValueAtTime(160,ac.currentTime);                                                                                                                                       
+      o.frequency.exponentialRampToValueAtTime(50,ac.currentTime+0.28);                                                                                                                       
+      g.gain.setValueAtTime(0.55,ac.currentTime);                                                                                                                                             
+      g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.28);                                                                                                                         
+      o.start(); o.stop(ac.currentTime+0.28);                                                                                                                                                 
+    }catch(e){}                                                                                                                                                                               
+  }                                                                                                                                                                                           
+  function playSnare(ac){                                                                                                                                                                     
+    try{                                                                                                                                                                                      
+      var buf=ac.createBuffer(1,Math.floor(ac.sampleRate*0.14),ac.sampleRate);                                                                                                              
+      var d=buf.getChannelData(0);                                                                                                                                                            
+      for(var i=0;i<d.length;i++) d[i]=(Math.random()*2-1);
+      var src=ac.createBufferSource(), g=ac.createGain();                                                                                                                                     
+      var f=ac.createBiquadFilter(); f.type='highpass'; f.frequency.value=900;                                                                                                                
+      src.buffer=buf; src.connect(f); f.connect(g); g.connect(ac.destination);                                                                                                                
+      g.gain.setValueAtTime(0.28,ac.currentTime);                                                                                                                                             
+      g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.14);                                                                                                                         
+      src.start(); src.stop(ac.currentTime+0.14);                                                                                                                                             
+      var o=ac.createOscillator(), g2=ac.createGain();                                                                                                                                      
+      o.connect(g2); g2.connect(ac.destination);                                                                                                                                              
+      o.frequency.value=220; o.type='triangle';                                                                                                                                             
+      g2.gain.setValueAtTime(0.12,ac.currentTime);                                                                                                                                            
+      g2.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.12);                                                                                                                      
+      o.start(); o.stop(ac.currentTime+0.12);                                                                                                                                                 
+    }catch(e){}                                                                                                                                                                             
+  }                                                                                                                                                                                           
+  function playHat(ac){                                                                                                                                                                     
+    try{
+      var buf=ac.createBuffer(1,Math.floor(ac.sampleRate*0.055),ac.sampleRate);                                                                                                               
+      var d=buf.getChannelData(0);                                                                                                                                                            
+      for(var i=0;i<d.length;i++) d[i]=(Math.random()*2-1);                                                                                                                                   
+      var src=ac.createBufferSource(), g=ac.createGain();                                                                                                                                     
+      var f=ac.createBiquadFilter(); f.type='highpass'; f.frequency.value=9000;                                                                                                             
+      src.buffer=buf; src.connect(f); f.connect(g); g.connect(ac.destination);                                                                                                                
+      g.gain.setValueAtTime(0.07,ac.currentTime);                                                                                                                                           
+      g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.055);                                                                                                                        
+      src.start(); src.stop(ac.currentTime+0.055);                                                                                                                                          
+    }catch(e){}                                                                                                                                                                               
+  }                                                                                                                                                                                         
+  function playMelody(ac, freq){                                                                                                                                                              
+    try{                                                                                                                                                                                    
+      var o=ac.createOscillator(), g=ac.createGain();
+      o.type='square'; o.frequency.value=freq*0.5;                                                                                                                                            
+      o.connect(g); g.connect(ac.destination);                                                                                                                                                
+      g.gain.setValueAtTime(0.07,ac.currentTime);                                                                                                                                             
+      g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.18);                                                                                                                         
+      o.start(); o.stop(ac.currentTime+0.18);                                                                                                                                                 
+    }catch(e){}                                                                                                                                                                               
+  }                                                                                                                                                                                           
+  function playScore(type){                                                                                                                                                                 
+    var ac=getAC(); if(!ac) return;                                                                                                                                                           
+    if(type==='good'){                                                                                                                                                                      
+      try{                                                                                                                                                                                    
+        [523,659,784].forEach(function(f,i){                                                                                                                                                
+          setTimeout(function(){                                                                                                                                                              
+            var o=ac.createOscillator(),g=ac.createGain();                                                                                                                                    
+            o.type='sine';o.frequency.value=f;                                                                                                                                                
+            o.connect(g);g.connect(ac.destination);                                                                                                                                           
+            g.gain.setValueAtTime(0.18,ac.currentTime);                                                                                                                                     
+            g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.15);                                                                                                                   
+            o.start();o.stop(ac.currentTime+0.15);                                                                                                                                          
+          },i*80);                                                                                                                                                                            
+        });                                                                                                                                                                                   
+      }catch(e){}
+    } else {                                                                                                                                                                                  
+      try{                                                                                                                                                                                  
+        [220,196].forEach(function(f,i){
+          setTimeout(function(){                                                                                                                                                              
+            var o=ac.createOscillator(),g=ac.createGain();
+            o.type='sawtooth';o.frequency.value=f;                                                                                                                                            
+            o.connect(g);g.connect(ac.destination);                                                                                                                                           
+            g.gain.setValueAtTime(0.18,ac.currentTime);                                                                                                                                       
+            g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.22);                                                                                                                   
+            o.start();o.stop(ac.currentTime+0.22);                                                                                                                                            
+          },i*120);                                                                                                                                                                         
+        });                                                                                                                                                                                   
+      }catch(e){}                                                                                                                                                                           
+    }
+  }                                                                                                                                                                                           
+                                                                                                                                                                                              
+  /* ── init ── */                                                                                                                                                                            
+  drawIdle();                                                                                                                                                                                 
+                                                                                                                                                                                            
+  })();
+  </script>
+  </body>                                                                                                                                                                                     
+  </html>
